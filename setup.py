@@ -5,7 +5,7 @@ setup(
     version='2.7.62',
     author="CintagramABP",
     description="PBCT API",
-    long_description="BCSFE_Python personal api",
+    long_description="BCSFE_Python API",
     url="",
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
