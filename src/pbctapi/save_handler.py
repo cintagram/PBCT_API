@@ -10,6 +10,12 @@ class TcCodeInvalidError(InvalidSaveError):
 
 class SVFileCorruptedError(InvalidSaveError):
 	pass
+	
+class InternalTkinterCrashedError(Exception):
+	pass
+	
+class InvalidValueProvidedError(Exception):
+	pass
 
 class SaveManager:
 	def __init__(self, mode: int, ev: Optional[int] = 2, country: Optional[str] = None, tc: Optional[str] = None, cc: Optional[int] = None, gv: Optional[str] = None, path: Optional[str] = None):
@@ -116,4 +122,36 @@ class SaveManager:
 			
 			
 	def DownloadSaveData(self):
-		pass
+		if self.tk_req:
+			self.savepath = helper.save_file(
+				"Path where Save File will be stored",
+        BCSFE_Python_Discord.helper.get_save_file_filetype(),
+        BCSFE_Python_Discord.helper.get_save_path_home(),
+    )
+		elif not self.tk_req:
+			continue
+		else:
+			raise InternalTkinterCrashedError("Tkinter Protocol Crashed or path is not configured.")
+		BCSFE_Python_Discord.helper.set_save_path(self.savepath)
+
+		try:
+			self.gv = BCSFE_Python_Discord.helper.str_to_gv(self.gv)
+		except:
+			raise InvalidValueProvidedError(f"Failed to Convert Provided gv '{self.gv}' to gv format.")
+
+		try:
+			save_data = BCSFE_Python_Discord.server_handler.download_save(self.country, self.tc, self.cc, self.gv)
+		except:
+			raise TcCodeInvalidError("Provided Transfer Information is not valid. Please check your info and try again.")
+
+		try:
+			save_data = BCSFE_Python_Discord.patcher.patch_save_data(save_data, self.country)
+		except:
+			raise SVFileCorruptedError("Failed to patch save data.")
+
+		try:
+			save_stats = BCSFE_Python_Discord.parse_save.start_parse(save_data, self.country)
+		except:
+			raise SVFileCorruptedError("Failed to parse save data.")
+		if save_stats == 0: #save stats is empty
+			raise SVFileCorruptedError("Failed to parse save data")
