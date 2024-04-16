@@ -56,6 +56,7 @@ class SaveManager:
 				SaveManager(mode=2, ev=2, path='/home/SAVE_DATA')
 				SaveManager(mode=1, country='kr', tc='testestte', cc=1234, gv='13.2.0', path=r'C:\Users\user\Desktop\SAVE_DATA')
 		"""
+		global save_stats
 		if isinstance(mode, int):
 			loadmode_list = [1, 2, 3]
 			if mode in loadmode_list:
@@ -122,6 +123,7 @@ class SaveManager:
 			
 			
 	def DownloadSaveData(self):
+		"""Downloading Save data"""
 		if self.tk_req:
 			self.savepath = helper.save_file(
 				"Path where Save File will be stored",
@@ -150,8 +152,14 @@ class SaveManager:
 			raise SVFileCorruptedError("Failed to patch save data.")
 
 		try:
+			global save_stats
 			save_stats = BCSFE_Python_Discord.parse_save.start_parse(save_data, self.country)
 		except:
 			raise SVFileCorruptedError("Failed to parse save data.")
 		if save_stats == 0: #save stats is empty
 			raise SVFileCorruptedError("Failed to parse save data")
+		else:
+			continue
+
+		BCSFE_Python_Discord.edits.save_management.save.save_save(save_stats)
+		return save_stats
