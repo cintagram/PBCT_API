@@ -127,9 +127,9 @@ class SaveManager:
 		if self.tk_req:
 			self.savepath = helper.save_file(
 				"Path where Save File will be stored",
-        BCSFE_Python_Discord.helper.get_save_file_filetype(),
-        BCSFE_Python_Discord.helper.get_save_path_home(),
-    )
+                BCSFE_Python_Discord.helper.get_save_file_filetype(),
+                BCSFE_Python_Discord.helper.get_save_path_home()
+            )
 		elif not self.tk_req:
 			continue
 		else:
@@ -152,8 +152,7 @@ class SaveManager:
 			raise SVFileCorruptedError("Failed to patch save data.")
 
 		try:
-			global save_stats
-			save_stats = BCSFE_Python_Discord.parse_save.start_parse(save_data, self.country)
+			self.save_stats = BCSFE_Python_Discord.parse_save.start_parse(save_data, self.country)
 		except:
 			raise SVFileCorruptedError("Failed to parse save data.")
 		if save_stats == 0: #save stats is empty
@@ -161,5 +160,5 @@ class SaveManager:
 		else:
 			continue
 
-		BCSFE_Python_Discord.edits.save_management.save.save_save(save_stats)
-		return save_stats
+		BCSFE_Python_Discord.edits.save_management.save.save_save(self.save_stats)
+		return self.save_stats
